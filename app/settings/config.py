@@ -9,4 +9,10 @@ class BotSettings(BaseSettings):
     bot_admin_id: str
 
 
+class DatabaseSettings(BaseSettings):
+    db_url: str = "sqlite+aiosqlite:///./db.sqlite3"
+    db_echo: bool = True
+
+
 settings = BotSettings()
+db_settings = DatabaseSettings()
