@@ -15,3 +15,4 @@ storage = RedisStorage(redis=redis)
 
 bot = Bot(token=settings.bot_api_key, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
 dp = Dispatcher(storage=storage)
+# dp = Dispatcher(storage=storage) <- если Redis не подключен
