@@ -7,6 +7,7 @@ class UserStates(StatesGroup):
 
 class Anketa(StatesGroup):
     get_floor = State()
+    get_fio = State()
     get_auditory = State()
     get_trouble = State()
     description = State()

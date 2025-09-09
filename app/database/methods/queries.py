@@ -31,15 +31,19 @@ class DBMethods:
         report_floor: int,
         report_cabinet: int,
         report_reason: str,
+        report_fio: str,
+        user_username: str,
         report_description: str = None
     ) -> Report:
         async with self.session_factory() as session:
             new_report = Report(
                 user_id=user_id,
+                user_username=user_username,
                 report_floor=report_floor,
                 report_cabinet=report_cabinet,
                 report_reason=report_reason,
                 report_description=report_description,
+                report_fio=report_fio
             )
 
             session.add(new_report)
