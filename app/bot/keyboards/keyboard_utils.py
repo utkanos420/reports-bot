@@ -7,6 +7,11 @@ def create_report_keyboard():
     keyboard_builder.adjust(1)
     return keyboard_builder.as_markup()
 
+def cancel_keyboard():
+    keyboard_builder = InlineKeyboardBuilder()
+    keyboard_builder.button(text="Отменить", callback_data="cancel_report")
+    keyboard_builder.adjust(1)
+    return keyboard_builder.as_markup()
 
 def skip_report_description():
     keyboard_builder = InlineKeyboardBuilder()

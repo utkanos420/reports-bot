@@ -16,23 +16,6 @@ from bot.utils.filter import anti_spam_handler
 user_main_router = Router()
 db_methods = DBMethods()
 
-@user_main_router.message(Command("report"), StateFilter(UserStates.main_state))
-async def create_report_from_command(message: types.Message, state: FSMContext):
-
-    if message.chat.type != "private" or await db_methods.user_is_muted(message.from_user.id) or not await anti_spam_handler(message):
-        return
-
-    await message.answer(render_template("user/problem.html"), parse_mode="HTML")
-    await message.answer("<b>Выберите ваш этаж:</b>", reply_markup=floors_keyboard(), parse_mode="HTML")
-    await state.set_state(Anketa.get_floor)
-
-
-@user_main_router.message(Command("admin"), StateFilter(UserStates.main_state))
-async def admin_login_by_password(message: types.Message, state: FSMContext):
-    await message.answer(render_template("user/admin_login_by_password.html"), parse_mode="HTML")
-    await state.set_state(UserStates.get_password)
-
-
 @user_main_router.message(Command("cancel"), ~StateFilter(UserStates.main_state))
 async def cancel_report_as_command(message: types.Message, state: FSMContext):
     await message.answer("Вы вернулись в главное меню! Используйте /report для создания нового запроса.")
@@ -55,10 +38,28 @@ async def create_report_from_button(callback: CallbackQuery, state: FSMContext):
         return
 
     await callback.message.answer(render_template("user/problem.html"), parse_mode="HTML")
-    await callback.message.answer("<b>Выберите ваш этаж:</b>", reply_markup=floors_keyboard(), parse_mode="HTML")
     await state.update_data(id=callback.from_user.id)
+    await state.update_data(username=callback.from_user.username)
 
+    await state.set_state(Anketa.get_fio)
+
+
+@user_main_router.message(F.text, StateFilter(Anketa.get_fio))
+async def handle_fio(message: types.Message, state: FSMContext):
+
+    if message.chat.type != "private" or await db_methods.user_is_muted(message.from_user.id) or not await anti_spam_handler(message):
+        return
+
+    message_len = len(message.text)
+    if message_len > 70:
+        await message.answer(render_template("user/report_length_warning.html"), parse_mode="HTML")
+        await state.set_state(Anketa.get_fio)
+        return
+    
     await state.set_state(Anketa.get_floor)
+    await message.answer(render_template("user/choose_floor.html"), parse_mode="HTML", reply_markup=floors_keyboard())
+
+    await state.update_data(fio=message.text)
 
 
 @user_main_router.callback_query(F.data.startswith("floor_"), StateFilter(Anketa.get_floor))
@@ -77,7 +78,7 @@ async def handle_floor_button(callback: CallbackQuery, state: FSMContext):
     }
 
     await callback.message.answer(
-        text=render_template("user/choose_floor.html"),
+        text=render_template("user/choose_cabinet.html"),
         reply_markup=floor_keyboards[floor](),
         parse_mode="HTML"
     )
@@ -165,7 +166,9 @@ async def handle_skip_description_button(callback: CallbackQuery, state: FSMCont
         report_floor=data['floor'],
         report_cabinet=data['audi'],
         report_reason=data['trouble'],
-        report_description=data['description']
+        report_description=data['description'],
+        report_fio=data['fio'],
+        user_username=data['username']
     )
 
     await state.set_state(UserStates.main_state)
@@ -197,7 +200,9 @@ async def handle_adding_report_description(message: types.Message, state: FSMCon
         report_floor=data['floor'],
         report_cabinet=data['audi'],
         report_reason=data['trouble'],
-        report_description=data['description']
+        report_description=data['description'],
+        report_fio=data['fio'],
+        user_username=data['username']
     )
 
     await state.set_state(UserStates.main_state)

@@ -12,8 +12,6 @@ from bot.states.admins import AdminStates
 from templates.template_engine import render_template
 
 
-
-
 db_methods = DBMethods()
 admin_router = Router()
 
