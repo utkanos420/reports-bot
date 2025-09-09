@@ -16,3 +16,7 @@ class DatabaseSettings(BaseSettings):
 
 settings = BotSettings()
 db_settings = DatabaseSettings()
+
+admin_ids = []
+admin_ids.append(int(settings.bot_admin_id))
+print(admin_ids)
