@@ -18,18 +18,11 @@ from loguru import logger
 
 class InterceptHandler(logging.Handler):
     def emit(self, record):
-        level = logger.level(record.levelname).name if record.levelname in logger._levels else "INFO"
-        logger.log(level, record.getMessage())
-
-logging.getLogger('aiogram').setLevel(logging.DEBUG)
-logging.getLogger('aiogram').addHandler(InterceptHandler())
-logging.getLogger('asyncio').setLevel(logging.DEBUG)
-logging.getLogger('asyncio').addHandler(InterceptHandler())
-
-logger.add(lambda msg: print(msg, end=""),
-           format="<level>[{time:HH:mm:ss}] {level:<8} {name}:{line} - {message}</level>",
-           level="DEBUG",
-           colorize=True)
+        try:
+            level = logger.level(record.levelname).name
+        except Exception:
+            level = record.levelno
+        logger.opt(depth=6, exception=record.exc_info).log(level, record.getMessage())
 
 
 async def main():
