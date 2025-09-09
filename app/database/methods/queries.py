@@ -37,7 +37,7 @@ class DBMethods:
             new_report = Report(
                 user_id=user_id,
                 report_floor=report_floor,
-                report_audience=report_cabinet,
+                report_cabinet=report_cabinet,
                 report_reason=report_reason,
                 report_description=report_description,
             )
