@@ -59,6 +59,7 @@ async def mute_user_from_button(callback: CallbackQuery, state: FSMContext):
 async def notify_user_from_button(callback: CallbackQuery, state: FSMContext):
     user_id = callback.data.removeprefix("notice_user_by_id_")
     await notice_user(user_id=user_id)
+    await callback.message.answer(text="Уведомление отправлено пользователю")
 
 
 @admin_router.message(Command("unmute"), StateFilter(AdminStates.main_state))
