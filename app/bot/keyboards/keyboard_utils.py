@@ -26,11 +26,11 @@ def floors_keyboard():
 
 
 def floor_1_audiences():
-    audiences = [
+    audiences = sorted([
         "1.08", "1.09", "1.10", "1.11", "1.12", "1.14",
         "1.16", "1.18", "1.19", "1.26", "1.27", "1.28",
         "1.29", "1.30", "1.31", "1.32", "1.40", "1.43"
-    ]
+    ], key=lambda x: [int(n) for n in x.split('.')])
     keyboard_builder = InlineKeyboardBuilder()
     for aud in audiences:
         keyboard_builder.button(text=aud, callback_data=f"audience_{aud}")
@@ -39,11 +39,11 @@ def floor_1_audiences():
 
 
 def floor_2_audiences():
-    audiences = [
+    audiences = sorted([
         "2.1", "2.4", "2.8", "2.12", "2.13", "2.16", "2.17", "2.18", "2.20",
         "2.27", "2.28", "2.29", "2.30", "2.31", "2.32", "2.34", "2.35", "2.36",
         "2.37", "2.40", "2.41", "2.45", "2.46", "2.47", "2.48", "2.49", "2.50", "2.51", "2.52"
-    ]
+    ], key=lambda x: [int(n) for n in x.split('.')])
     keyboard_builder = InlineKeyboardBuilder()
     for aud in audiences:
         keyboard_builder.button(text=aud, callback_data=f"audience_{aud}")
@@ -52,10 +52,10 @@ def floor_2_audiences():
 
 
 def floor_3_audiences():
-    audiences = [
+    audiences = sorted([
         "3.14", "3.16", "3.22", "3.29", "3.31", "3.32", "3.33", "3.34", "3.35",
         "3.36", "3.37", "3.38", "3.39", "3.40", "3.44", "3.50", "3.51", "3.53", "3.54"
-    ]
+    ], key=lambda x: [int(n) for n in x.split('.')])
     keyboard_builder = InlineKeyboardBuilder()
     for aud in audiences:
         keyboard_builder.button(text=aud, callback_data=f"audience_{aud}")
@@ -64,7 +64,9 @@ def floor_3_audiences():
 
 
 def floor_4_audiences():
-    audiences = ["4.2", "4.3", "4.5", "4.6", "4.8", "4.9", "4.12"]
+    audiences = sorted([
+        "4.2", "4.3", "4.5", "4.6", "4.8", "4.9", "4.12"
+    ], key=lambda x: [int(n) for n in x.split('.')])
     keyboard_builder = InlineKeyboardBuilder()
     for aud in audiences:
         keyboard_builder.button(text=aud, callback_data=f"audience_{aud}")
