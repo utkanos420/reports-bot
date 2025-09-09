@@ -13,10 +13,11 @@ class Report(SQLModel, table=True):
 
     id: Optional[int] = Field(default=None, primary_key=True)
     user_id: int = Field(foreign_key="users.user_id", nullable=False)
-    report_uuid: str = Field(default_factory=lambda: str(uuid.uuid4()), unique=True, nullable=False)
+    user_username: str = Field(nullable=False)
     report_floor: int = Field(nullable=False)
     report_cabinet: int = Field(nullable=False)
     report_reason: str = Field(nullable=False)
+    report_fio: str = Field(nullable=False)
     report_description: Optional[str] = Field(default=None, nullable=True)
     created_at: datetime = Field(default_factory=datetime.utcnow, nullable=False)
 
