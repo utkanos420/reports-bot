@@ -1,3 +1,5 @@
+import asyncio
+
 from aiogram import Router, types, F
 from aiogram.types import CallbackQuery
 from aiogram.fsm.context import FSMContext
@@ -11,6 +13,7 @@ from bot.keyboards.keyboard_utils import (floor_1_cabs, floors_keyboard, reason_
 from bot.states.users import UserStates, Anketa
 from bot.utils.sender import send_report_to_admins
 from bot.utils.filter import anti_spam_handler
+from bot.utils.google_sync import append_report
 
 
 user_main_router = Router()
@@ -156,7 +159,7 @@ async def handle_skip_description_button(callback: CallbackQuery, state: FSMCont
 
     await callback.message.answer(render_template("user/report_created.html"), parse_mode="HTML")
 
-    await state.update_data(description="Комментарий отсутсвует")
+    await state.update_data(description="Комментарий отсутствует")
 
     data = await state.get_data()
     user_id = data.get('id')
@@ -171,14 +174,20 @@ async def handle_skip_description_button(callback: CallbackQuery, state: FSMCont
         user_username=data['username']
     )
 
-    await state.set_state(UserStates.main_state)
+    # ✅ Добавляем запись в Google Sheets (в отдельном потоке, чтобы не тормозило бота)
+    asyncio.create_task(asyncio.to_thread(
+        append_report,
+        report.report_fio,
+        str(report.report_cabinet),
+        report.report_description or "Комментарий отсутствует"
+    ))
 
+    await state.set_state(UserStates.main_state)
     await send_report_to_admins(report.id)
 
 
 @user_main_router.message(F.text, StateFilter(Anketa.description))
 async def handle_adding_report_description(message: types.Message, state: FSMContext):
-
     if message.chat.type != "private" or await db_methods.user_is_muted(message.from_user.id) or not await anti_spam_handler(message):
         return
 
@@ -187,10 +196,10 @@ async def handle_adding_report_description(message: types.Message, state: FSMCon
         await message.answer(render_template("user/report_length_warning.html"), parse_mode="HTML")
         await state.set_state(Anketa.description)
         return
-    
+
     await message.answer(render_template("user/report_created.html"), parse_mode="HTML")
 
-    await state.update_data(desc=message.text)
+    await state.update_data(description=message.text)
 
     data = await state.get_data()
     user_id = data.get('id')
@@ -205,6 +214,13 @@ async def handle_adding_report_description(message: types.Message, state: FSMCon
         user_username=data['username']
     )
 
-    await state.set_state(UserStates.main_state)
 
+    asyncio.create_task(asyncio.to_thread(
+        append_report,
+        report.report_fio,
+        str(report.report_cabinet),
+        report.report_description or ""
+    ))
+
+    await state.set_state(UserStates.main_state)
     await send_report_to_admins(report.id)
