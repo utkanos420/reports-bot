@@ -1,4 +1,5 @@
 <div align=center>
+    <img src="https://ксипт.рф/wp-content/uploads/2025/02/logo_ksipt-1.png" alt="Logo" width="80" height="80">
     <h3 align=center> КСИПТ репорт бот</h3>
     <p align=center>Бот для c системным администраторами</p>
 </div>
@@ -36,17 +37,16 @@
 - [x] Защита от спама
 - [x] Обратная связь по заявке
 - [x] Блокировка пользователей
-- [] Разблокировка пользователей
-- [] Логгирование, аудит
-- [] Панель управления
-- [] Улучшенная обратная связь по заявке прямо в боте
-- [] Статистика по заявкам
-- [] API
+- [ ] Разблокировка пользователей
+- [ ] Логгирование, аудит
+- [ ] Панель управления
+- [ ] Улучшенная обратная связь по заявке прямо в боте
+- [ ] Статистика по заявкам
+- [ ] API
 
 ## Обратная связь
 
 * [![Telegram](https://img.shields.io/badge/Telegram-2CA5E0?logo=telegram&logoColor=white)](#) @utkanos420
 * [![Discord](https://img.shields.io/badge/Discord-%235865F2.svg?&logo=discord&logoColor=white)](#) @utkanos420
-* [![Gmail](https://img.shields.io/badge/Gmail-D14836?logo=gmail&logoColor=white)](#) twinkingdase@gmail.com
 
 
