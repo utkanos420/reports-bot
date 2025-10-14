@@ -1,5 +1,5 @@
 <div align=center>
-    <img src="https://ксипт.рф/wp-content/uploads/2025/02/logo_ksipt-1.png" alt="Logo" width="80" height="80">
+    <img src="https://kappa.lol/TSkVyU" alt="Logo" width="80" height="80">
     <h3 align=center> КСИПТ репорт бот</h3>
     <p align=center>Бот для c системным администраторами</p>
 </div>
