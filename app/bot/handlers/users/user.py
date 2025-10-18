@@ -1,7 +1,7 @@
 import asyncio
 
 from aiogram import Router, types, F
-from aiogram.types import CallbackQuery
+from aiogram.types import CallbackQuery, FSInputFile
 from aiogram.fsm.context import FSMContext
 from aiogram.filters import StateFilter, Command
 from database.methods.queries import DBMethods
@@ -19,6 +19,7 @@ from bot.utils.google_sync import append_report
 user_main_router = Router()
 db_methods = DBMethods()
 
+
 @user_main_router.message(Command("cancel"), ~StateFilter(UserStates.main_state))
 async def cancel_report_as_command(message: types.Message, state: FSMContext):
     await message.answer("Вы вернулись в главное меню! Используйте /report для создания нового запроса.")
@@ -31,7 +32,7 @@ async def create_report_from_command(message: types.Message, state: FSMContext):
     if message.chat.type != "private" or await db_methods.user_is_muted(message.from_user.id) or not await anti_spam_handler(message):
         return
 
-    await message.answer(render_template("user/welcome.html"), parse_mode="HTML", reply_markup=create_report_keyboard())
+    await message.answer(text=render_template("user/welcome.html"), parse_mode="HTML", reply_markup=create_report_keyboard(), )
 
 
 @user_main_router.callback_query(F.data == "create_report", StateFilter(UserStates.main_state))
@@ -40,7 +41,9 @@ async def create_report_from_button(callback: CallbackQuery, state: FSMContext):
     if callback.message.chat.type != "private" or await db_methods.user_is_muted(callback.from_user.id) or not await anti_spam_handler(callback.message):
         return
 
-    await callback.message.answer(render_template("user/problem.html"), parse_mode="HTML")
+    photo = FSInputFile("templates/images/fio_photo.jpg")
+    await callback.message.answer_photo(photo=photo, caption=render_template("user/fio.html"), parse_mode="HTML")
+    await callback.message.delete()
     await state.update_data(id=callback.from_user.id)
     await state.update_data(username=callback.from_user.username)
 
@@ -53,6 +56,7 @@ async def handle_fio(message: types.Message, state: FSMContext):
     if message.chat.type != "private" or await db_methods.user_is_muted(message.from_user.id) or not await anti_spam_handler(message):
         return
 
+
     message_len = len(message.text)
     if message_len > 70:
         await message.answer(render_template("user/report_length_warning.html"), parse_mode="HTML")
@@ -60,7 +64,8 @@ async def handle_fio(message: types.Message, state: FSMContext):
         return
     
     await state.set_state(Anketa.get_floor)
-    await message.answer(render_template("user/choose_floor.html"), parse_mode="HTML", reply_markup=floors_keyboard())
+    photo = FSInputFile("templates/images/floor_photo.jpg")
+    await message.answer_photo(photo=photo, caption=render_template("user/choose_floor.html"), parse_mode="HTML", reply_markup=floors_keyboard())
 
     await state.update_data(fio=message.text)
 
@@ -80,8 +85,10 @@ async def handle_floor_button(callback: CallbackQuery, state: FSMContext):
         4: floor_4_cabs,
     }
 
-    await callback.message.answer(
-        text=render_template("user/choose_cabinet.html"),
+    photo = FSInputFile("templates/images/cabinets_photo.jpg")
+    await callback.message.answer_photo(
+        photo=photo,
+        caption=render_template("user/choose_cabinet.html"),
         reply_markup=floor_keyboards[floor](),
         parse_mode="HTML"
     )
@@ -98,7 +105,8 @@ async def handle_cabinet_button(callback: CallbackQuery, state: FSMContext):
 
     audience_number = callback.data.removeprefix("cabinet_")
 
-    await callback.message.answer(text=render_template("user/choose_reason.html"), reply_markup=reason_keyboard(), parse_mode="HTML")
+    photo = FSInputFile("templates/images/reason_photo.jpg")
+    await callback.message.answer_photo(photo=photo, caption=render_template("user/choose_reason.html"), reply_markup=reason_keyboard(), parse_mode="HTML")
     await state.update_data(audi=audience_number)
     await state.set_state(Anketa.get_trouble)
     await callback.message.delete()
@@ -109,8 +117,9 @@ async def handle_reason_button(callback: CallbackQuery, state: FSMContext):
 
     if callback.message.chat.type != "private" or await db_methods.user_is_muted(callback.from_user.id):
         return
-
-    await callback.message.answer(render_template("user/problem_description.html"), parse_mode="HTML", reply_markup=skip_report_description())
+    
+    photo = FSInputFile("templates/images/description_photo.jpg")
+    await callback.message.answer_photo(photo=photo, caption=render_template("user/problem_description.html"), parse_mode="HTML", reply_markup=skip_report_description())
     await state.update_data(trouble="Проходка")
     await state.set_state(Anketa.description)
     await callback.message.delete()
@@ -122,7 +131,8 @@ async def handle_reason_button(callback: CallbackQuery, state: FSMContext):
     if callback.message.chat.type != "private" or await db_methods.user_is_muted(callback.from_user.id):
         return
 
-    await callback.message.answer(render_template("user/problem_description.html"), parse_mode="HTML", reply_markup=skip_report_description())
+    photo = FSInputFile("templates/images/description_photo.jpg")
+    await callback.message.answer_photo(photo=photo, caption=render_template("user/problem_description.html"), parse_mode="HTML", reply_markup=skip_report_description())
     await state.update_data(trouble="Оборудование")
     await state.set_state(Anketa.description)
     await callback.message.delete()
@@ -134,7 +144,8 @@ async def handle_reason_button(callback: CallbackQuery, state: FSMContext):
     if callback.message.chat.type != "private" or await db_methods.user_is_muted(callback.from_user.id):
         return
 
-    await callback.message.answer(render_template("user/problem_description.html"), parse_mode="HTML", reply_markup=skip_report_description())
+    photo = FSInputFile("templates/images/description_photo.jpg")
+    await callback.message.answer_photo(photo=photo, caption=render_template("user/problem_description.html"), parse_mode="HTML", reply_markup=skip_report_description())
     await state.update_data(trouble="Настройка оборудования")
     await state.set_state(Anketa.description)
     await callback.message.delete()
@@ -146,7 +157,8 @@ async def handle_reason_button(callback: CallbackQuery, state: FSMContext):
     if callback.message.chat.type != "private" or await db_methods.user_is_muted(callback.from_user.id):
         return
 
-    await callback.message.answer(render_template("user/problem_description.html"), parse_mode="HTML", reply_markup=skip_report_description())
+    photo = FSInputFile("templates/images/description_photo")
+    await callback.message.answer_photo(photo=photo, caption=render_template("user/problem_description.html"), parse_mode="HTML", reply_markup=skip_report_description())
     await state.update_data(trouble="другое")
     await state.set_state(Anketa.description)
     await callback.message.delete()
@@ -156,9 +168,11 @@ async def handle_reason_button(callback: CallbackQuery, state: FSMContext):
 async def handle_skip_description_button(callback: CallbackQuery, state: FSMContext):
     if callback.message.chat.type != "private" or await db_methods.user_is_muted(callback.from_user.id):
         return
+    
+    await callback.message.delete()
 
-    await callback.message.answer(render_template("user/report_created.html"), parse_mode="HTML")
-
+    photo = FSInputFile("templates/images/done_photo.jpg")
+    await callback.message.answer_photo(photo=photo, caption=render_template("user/report_created.html"), parse_mode="HTML")
     await state.update_data(description="Комментарий отсутствует")
 
     data = await state.get_data()
@@ -174,7 +188,6 @@ async def handle_skip_description_button(callback: CallbackQuery, state: FSMCont
         user_username=data['username']
     )
 
-    # ✅ Добавляем запись в Google Sheets (в отдельном потоке, чтобы не тормозило бота)
     asyncio.create_task(asyncio.to_thread(
         append_report,
         report.report_fio,
@@ -197,8 +210,8 @@ async def handle_adding_report_description(message: types.Message, state: FSMCon
         await state.set_state(Anketa.description)
         return
 
-    await message.answer(render_template("user/report_created.html"), parse_mode="HTML")
-
+    photo = FSInputFile("templates/images/done_photo.jpg")
+    await message.answer_photo(photo=photo, caption=render_template("user/report_created.html"), parse_mode="HTML")
     await state.update_data(description=message.text)
 
     data = await state.get_data()
