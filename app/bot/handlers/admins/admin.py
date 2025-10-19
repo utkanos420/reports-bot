@@ -5,7 +5,7 @@ from aiogram.filters import StateFilter, Command
 
 from database.methods.queries import DBMethods
 
-from bot.keyboards.dynamic_keyboards import mute_user_by_id, mark_as_reacted
+from bot.keyboards.dynamic_keyboards import mark_as_reacted
 from bot.utils.sender import notice_muted_user, notice_user
 from bot.states.admins import AdminStates
 
@@ -16,7 +16,10 @@ db_methods = DBMethods()
 admin_router = Router()
 
 
-@admin_router.callback_query(lambda c: c.data.startswith("show_report_by_id_"), StateFilter(AdminStates.main_state))
+@admin_router.callback_query(
+    lambda c: c.data.startswith("show_report_by_id_"),
+    StateFilter(AdminStates.main_state)
+)
 async def return_the_report_by_id(callback: CallbackQuery, state: FSMContext):
     post_id_str = callback.data.removeprefix("show_report_by_id_")
     post_id = int(post_id_str)
@@ -36,7 +39,7 @@ async def return_the_report_by_id(callback: CallbackQuery, state: FSMContext):
             f"\n"
             f"{report.report_description}",
             parse_mode="HTML",
-            reply_markup=mark_as_reacted(user_id=report.user_id)            
+            reply_markup=mark_as_reacted(user_id=report.user_id)
         )
 
     else:
@@ -44,7 +47,9 @@ async def return_the_report_by_id(callback: CallbackQuery, state: FSMContext):
         await callback.message.answer("Репорт не найден.")
 
 
-@admin_router.callback_query(lambda c: c.data.startswith("mute_user_by_id_"), StateFilter(AdminStates.main_state))
+@admin_router.callback_query(
+    lambda c: c.data.startswith("mute_user_by_id_"),
+    StateFilter(AdminStates.main_state))
 async def mute_user_from_button(callback: CallbackQuery, state: FSMContext):
     user_id = callback.data.removeprefix("mute_user_by_id_")
     db = DBMethods()
@@ -53,7 +58,9 @@ async def mute_user_from_button(callback: CallbackQuery, state: FSMContext):
     await notice_muted_user(user_id)
 
 
-@admin_router.callback_query(lambda c: c.data.startswith("notice_user_by_id_"), StateFilter(AdminStates.main_state))
+@admin_router.callback_query(
+    lambda c: c.data.startswith("notice_user_by_id_"),
+    StateFilter(AdminStates.main_state))
 async def notify_user_from_button(callback: CallbackQuery, state: FSMContext):
     user_id = callback.data.removeprefix("notice_user_by_id_")
     await notice_user(user_id=user_id)
